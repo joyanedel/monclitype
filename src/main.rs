@@ -1,4 +1,4 @@
-mod algorithms;
+mod sentences;
 mod types;
 
 fn main() {
