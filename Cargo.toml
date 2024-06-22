@@ -1,5 +1,5 @@
 [package]
-name = "monkeytype-rs"
+name = "monclitype"
 version = "0.1.0"
 edition = "2021"
 authors = ["joyanedel <iamjoyanedel@gmail.com>"]
