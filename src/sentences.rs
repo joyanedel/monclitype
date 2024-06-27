@@ -15,7 +15,7 @@ fn sentence_reducer(acc: String, new_event: &KeyEventSource) -> String {
                 format!("{} ", acc)
             }
         }
-        KeyCode::Char(v) => format!("{}{}", acc, v),
+        KeyCode::Char(v) => format!("{}{}", acc, v.to_lowercase()),
         KeyCode::Backspace => {
             if acc.len() == 0 {
                 acc

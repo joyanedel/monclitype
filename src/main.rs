@@ -12,10 +12,7 @@ use ratatui::{
     Frame,
 };
 use splitter::get_current_game_status;
-use std::{
-    io::{self},
-    time::Instant,
-};
+use std::{fmt::write, io, time::Instant};
 
 use types::{KeyEventSource, WordGameStatus, WordMatch};
 
@@ -35,34 +32,6 @@ fn main() -> io::Result<()> {
     tui::restore()?;
     app_result
 }
-
-// fn handle_events() -> Result<Option<KeyEventSource>, ()> {
-//     if event::poll(Duration::from_millis(50)).unwrap_or(false) {
-//         let read_event = event::read();
-//         if read_event.is_err() {
-//             return Ok(None);
-//         }
-
-//         if let Event::Key(key) = read_event.unwrap() {
-//             return if key.kind == event::KeyEventKind::Press && key.code == KeyCode::Esc {
-//                 Err(())
-//             } else {
-//                 Ok(Some(KeyEventSource {
-//                     key: key.code,
-//                     timestamp: Instant::now(),
-//                 }))
-//             };
-//         }
-//     }
-//     Ok(None)
-// }
-
-// fn ui(frame: &mut Frame, content: &str) {
-//     frame.render_widget(
-//         Paragraph::new(content).block(Block::bordered().title(TITLE_BLOCK)),
-//         frame.size(),
-//     );
-// }
 
 #[derive(Debug, Default)]
 pub struct App {
@@ -112,7 +81,7 @@ impl Widget for &App {
     where
         Self: Sized,
     {
-        let title = Title::from("MoncliType");
+        let title = Title::from(TITLE_BLOCK);
         let instructions = Title::from("Press <ESC> to exit");
 
         let block = Block::default()
@@ -144,7 +113,10 @@ impl Widget for &App {
             .collect_vec();
         let already_written_words_span = build_word(&already_written_words_vec);
         let current_word_spans = build_word(&current_word);
-        let future_words = future_words.unwrap_or(String::new());
+        let future_words = match future_words {
+            Some(v) => format!(" {}", v),
+            None => String::new(),
+        };
         let future_words_chars: Vec<EitherOrBoth<char, char>> = future_words
             .chars()
             .map(|c| EitherOrBoth::Right(c))
