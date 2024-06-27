@@ -1,8 +1,8 @@
 use crossterm::event::KeyCode;
 use itertools::EitherOrBoth;
-use std::time::Instant;
+use std::{error::Error, fmt::Display, time::Instant};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct KeyEventSource {
     pub key: KeyCode,
     pub timestamp: Instant,
@@ -18,3 +18,11 @@ pub struct WordGameStatus(pub Vec<WordMatch>, pub WordMatch, pub Option<String>)
 
 #[derive(Debug)]
 pub struct GameFinished;
+
+impl Display for GameFinished {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Game finished")
+    }
+}
+
+impl Error for GameFinished {}

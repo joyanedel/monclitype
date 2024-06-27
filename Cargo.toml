@@ -9,4 +9,4 @@ authors = ["joyanedel <iamjoyanedel@gmail.com>"]
 [dependencies]
 crossterm = "0.27.0"
 itertools = "0.13.0"
-tui = "0.19.0"
+ratatui = "0.26.3"
