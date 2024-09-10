@@ -1,4 +1,5 @@
 use crossterm::event::KeyCode;
+use rand::Rng;
 
 use crate::types::KeyEventSource;
 
@@ -29,6 +30,22 @@ fn sentence_reducer(acc: String, new_event: &KeyEventSource) -> String {
 
 pub fn verify_sentence_input(input_sentence: &str, target_sentence: &str) -> bool {
     input_sentence.eq(target_sentence)
+}
+
+pub fn pick_random_words_from_dictionary(dictionary: &Vec<&str>, quantity: usize) -> Vec<String> {
+    let upper_bound = dictionary.len();
+    let mut rng = rand::thread_rng();
+
+    let r = (0..quantity)
+        .map(|_| {
+            dictionary
+                .get(rng.gen::<usize>() % upper_bound)
+                .unwrap()
+                .to_string()
+        })
+        .collect();
+
+    r
 }
 
 #[cfg(test)]

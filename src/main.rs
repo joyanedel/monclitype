@@ -1,3 +1,4 @@
+use clap::Parser;
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use itertools::{EitherOrBoth, Itertools};
 use ratatui::{
@@ -11,8 +12,13 @@ use ratatui::{
     },
     Frame,
 };
+use sentences::pick_random_words_from_dictionary;
 use splitter::get_current_game_status;
-use std::{fmt::write, io, time::Instant};
+use std::{
+    fs::read_to_string,
+    io::{self},
+    time::Instant,
+};
 
 use types::{KeyEventSource, WordGameStatus, WordMatch};
 
@@ -22,12 +28,26 @@ mod tui;
 mod types;
 
 const TITLE_BLOCK: &str = "MoncliType";
-const TARGET_WORD: &str = "hello world como estais locos";
+const TARGET_SENTENCE_LENGTH: usize = 25;
+
+#[derive(Debug, Parser)]
+#[command(version, about, long_about = None)]
+struct Args {
+    #[arg(short, long, default_value = "./dictionaries/default.txt")]
+    dictionary_dir: String,
+}
 
 fn main() -> io::Result<()> {
     // setup terminal
     let mut terminal = tui::init()?;
-    let app_result = App::default().run(&mut terminal);
+    let args = Args::parse();
+
+    let dictionary = read_to_string(args.dictionary_dir).unwrap();
+    let dictionary = dictionary.lines().collect();
+
+    let target_word =
+        pick_random_words_from_dictionary(&dictionary, TARGET_SENTENCE_LENGTH).join(" ");
+    let app_result = App::default().run(&mut terminal, target_word);
 
     tui::restore()?;
     app_result
@@ -36,11 +56,13 @@ fn main() -> io::Result<()> {
 #[derive(Debug, Default)]
 pub struct App {
     events: Vec<KeyEventSource>,
+    target_word: String,
     exit: bool,
 }
 
 impl App {
-    pub fn run(&mut self, terminal: &mut tui::Tui) -> io::Result<()> {
+    pub fn run(&mut self, terminal: &mut tui::Tui, target_word: String) -> io::Result<()> {
+        self.target_word = target_word;
         loop {
             terminal.draw(|frame| self.render_frame(frame))?;
             self.handle_events()?;
@@ -94,7 +116,7 @@ impl Widget for &App {
             .borders(Borders::ALL)
             .border_set(border::THICK);
 
-        let game_status = get_current_game_status(&self.events, TARGET_WORD);
+        let game_status = get_current_game_status(&self.events, &self.target_word);
         if game_status.is_err() {
             return;
         }
