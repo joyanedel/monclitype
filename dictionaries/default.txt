@@ -6734,7 +6734,6 @@ contributors
 salvador
 ali
 salad
-np
 monroe
 tender
 violations

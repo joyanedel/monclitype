@@ -70,6 +70,27 @@ impl App {
             if self.exit {
                 break;
             }
+
+            // check if user has typed last word
+            let game_status = get_current_game_status(&self.events, &self.target_word);
+            if game_status.is_err() {
+                break;
+            }
+            let WordGameStatus(_, current_word, future_words) = game_status.unwrap();
+            if future_words.is_some_and(|word| word.len() > 0) {
+                continue;
+            }
+
+            // there is no remaining letters in target word to fill
+            if current_word
+                .iter()
+                .take_while(|w| w.is_both())
+                .collect::<Vec<_>>()
+                .len()
+                == current_word.len()
+            {
+                break;
+            }
         }
         Ok(())
     }
