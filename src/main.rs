@@ -8,7 +8,7 @@ use ratatui::{
     text::{Line, Span},
     widgets::{
         block::{Position, Title},
-        Block, Borders, Paragraph, Widget,
+        Block, Borders, Paragraph, Widget, Wrap,
     },
     Frame,
 };
@@ -162,6 +162,7 @@ impl Widget for &App {
                     .bg(ratatui::style::Color::Rgb(10, 10, 10))
                     .fg(ratatui::style::Color::Yellow),
             )
+            .wrap(Wrap { trim: true })
             .render(area, buf);
     }
 }
