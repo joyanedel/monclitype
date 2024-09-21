@@ -81,6 +81,9 @@ impl TypingPlayground {
 }
 
 impl Widget for &TypingPlayground {
+    /// Render the TypingPlayground widget
+    ///
+    /// The widget will render the current state of the game
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer)
     where
         Self: Sized,
@@ -115,8 +118,8 @@ impl Widget for &TypingPlayground {
             })
             .cloned()
             .collect_vec();
-        let already_written_words_span = build_word(&already_written_words_vec);
-        let current_word_spans = build_word(&current_word);
+        let already_written_words_span = build_word_span(&already_written_words_vec);
+        let current_word_spans = build_word_span(&current_word);
         let future_words = match future_words {
             Some(v) => format!(" {}", v),
             None => String::new(),
@@ -125,7 +128,7 @@ impl Widget for &TypingPlayground {
             .chars()
             .map(|c| EitherOrBoth::Right(c))
             .collect();
-        let future_words_spans = build_word(&future_words_chars);
+        let future_words_spans = build_word_span(&future_words_chars);
 
         let all_words = already_written_words_span
             .iter()
@@ -149,10 +152,19 @@ impl Widget for &TypingPlayground {
     }
 }
 
-fn build_word(word: &WordMatch) -> Vec<Span> {
+/// Build a span for a word. The result is a vector of spans, one for each character
+fn build_word_span(word: &WordMatch) -> Vec<Span> {
     word.iter().map(build_span_char).collect_vec()
 }
 
+/// Build a span for a character
+/// If the character is the same in both sides, it will be white
+///
+/// If the character is different, it will be red and the target character will be rendered
+///
+/// If the character is only in the target word, it will be grey
+///
+/// If the character is only in the user input, it will be red
 fn build_span_char(pair_of_chars: &EitherOrBoth<char>) -> Span {
     let color = match pair_of_chars {
         EitherOrBoth::Left(_) => ratatui::style::Color::Red,
@@ -166,7 +178,7 @@ fn build_span_char(pair_of_chars: &EitherOrBoth<char>) -> Span {
         }
     };
     let letter = match pair_of_chars {
-        EitherOrBoth::Both(a, _) => a,
+        EitherOrBoth::Both(_, b) => b,
         EitherOrBoth::Left(v) => v,
         EitherOrBoth::Right(v) => v,
     };

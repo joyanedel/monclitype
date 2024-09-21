@@ -28,6 +28,7 @@ fn sentence_reducer(acc: String, new_event: &KeyEventSource) -> String {
     }
 }
 
+#[allow(unused)]
 pub fn verify_sentence_input(input_sentence: &str, target_sentence: &str) -> bool {
     input_sentence.eq(target_sentence)
 }
