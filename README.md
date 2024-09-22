@@ -23,7 +23,7 @@ Once you type out the quote, the game will be over. You can then press `ESC` (`C
 
 ## Dictionary
 
-The words used in MoncliType are randomly generated from a dictionary of common English words. The dictionary is stored in the `dictionary.txt` file in the `dictionaries` directory. You can add or remove words from the dictionary to customize the game or you can load a different dictionary file by passing the path to the file as a command-line argument.
+The words used in MoncliType are randomly generated from a dictionary of common English words. The dictionary is stored in the `default.txt` file in the `dictionaries` directory. You can add or remove words from the dictionary to customize the game or you can load a different dictionary file by passing the path to the file as a command-line argument.
 
 Example:
 
