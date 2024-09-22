@@ -4,7 +4,7 @@ use std::{
     fs::read_to_string,
     io::{self},
 };
-use views::{run::Runnable, typing_playground::TypingPlayground};
+use views::{run::Runnable, statistics::StatisticsView, typing_playground::TypingPlayground};
 
 mod sentences;
 mod splitter;
@@ -31,8 +31,17 @@ fn main() -> io::Result<()> {
 
     let target_word =
         pick_random_words_from_dictionary(&dictionary, TARGET_SENTENCE_LENGTH).join(" ");
-    let app_result = TypingPlayground::new(target_word).run(&mut terminal);
+
+    // Typing playground
+    TypingPlayground::new(target_word.clone())
+        .run(&mut terminal)
+        .expect("There was something wrong");
+
+    // Statistics view
+    StatisticsView::new(vec![], target_word)
+        .run(&mut terminal)
+        .expect("Something went wrong with statistics");
 
     tui::restore()?;
-    app_result
+    Ok(())
 }
