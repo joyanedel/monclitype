@@ -14,6 +14,8 @@ use crate::types::{KeyEventSource, WordGameStatus, WordMatch};
 use std::io;
 use std::time::Instant;
 
+use super::run::Runnable;
+
 #[derive(Debug, Default)]
 pub struct TypingPlayground {
     events: Vec<KeyEventSource>,
@@ -22,8 +24,39 @@ pub struct TypingPlayground {
 }
 
 impl TypingPlayground {
-    pub fn run(&mut self, terminal: &mut tui::Tui, target_word: String) -> io::Result<()> {
-        self.target_word = target_word;
+    pub fn new(target_word: String) -> Self {
+        let mut _self = TypingPlayground::default();
+        _self.target_word = target_word;
+
+        _self
+    }
+
+    fn render_frame(&self, frame: &mut Frame) {
+        frame.render_widget(self, frame.size())
+    }
+
+    fn handle_events(&mut self) -> io::Result<()> {
+        match event::read()? {
+            Event::Key(key_event)
+                if key_event.kind == KeyEventKind::Press && key_event.code == KeyCode::Esc =>
+            {
+                self.exit = true;
+            }
+            Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
+                self.events.push(KeyEventSource {
+                    key: key_event.code,
+                    timestamp: Instant::now(),
+                });
+            }
+            _ => {}
+        };
+
+        Ok(())
+    }
+}
+
+impl Runnable for TypingPlayground {
+    fn run(&mut self, terminal: &mut tui::Tui) -> io::Result<()> {
         loop {
             terminal.draw(|frame| self.render_frame(frame))?;
             self.handle_events()?;
@@ -53,29 +86,6 @@ impl TypingPlayground {
                 break;
             }
         }
-        Ok(())
-    }
-
-    fn render_frame(&self, frame: &mut Frame) {
-        frame.render_widget(self, frame.size())
-    }
-
-    fn handle_events(&mut self) -> io::Result<()> {
-        match event::read()? {
-            Event::Key(key_event)
-                if key_event.kind == KeyEventKind::Press && key_event.code == KeyCode::Esc =>
-            {
-                self.exit = true;
-            }
-            Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
-                self.events.push(KeyEventSource {
-                    key: key_event.code,
-                    timestamp: Instant::now(),
-                });
-            }
-            _ => {}
-        };
-
         Ok(())
     }
 }

@@ -4,7 +4,7 @@ use std::{
     fs::read_to_string,
     io::{self},
 };
-use views::typing_playground::TypingPlayground;
+use views::{run::Runnable, typing_playground::TypingPlayground};
 
 mod sentences;
 mod splitter;
@@ -31,7 +31,7 @@ fn main() -> io::Result<()> {
 
     let target_word =
         pick_random_words_from_dictionary(&dictionary, TARGET_SENTENCE_LENGTH).join(" ");
-    let app_result = TypingPlayground::default().run(&mut terminal, target_word);
+    let app_result = TypingPlayground::new(target_word).run(&mut terminal);
 
     tui::restore()?;
     app_result
