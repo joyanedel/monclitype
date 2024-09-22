@@ -2,7 +2,7 @@ use crossterm::event::KeyCode;
 use itertools::EitherOrBoth;
 use std::{error::Error, fmt::Display, time::Instant};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct KeyEventSource {
     pub key: KeyCode,
     pub timestamp: Instant,

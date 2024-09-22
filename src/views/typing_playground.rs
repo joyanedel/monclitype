@@ -31,6 +31,10 @@ impl TypingPlayground {
         _self
     }
 
+    pub fn get_user_events(&self) -> Vec<KeyEventSource> {
+        self.events[..].to_vec()
+    }
+
     fn render_frame(&self, frame: &mut Frame) {
         frame.render_widget(self, frame.size())
     }

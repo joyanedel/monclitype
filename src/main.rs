@@ -33,12 +33,14 @@ fn main() -> io::Result<()> {
         pick_random_words_from_dictionary(&dictionary, TARGET_SENTENCE_LENGTH).join(" ");
 
     // Typing playground
-    TypingPlayground::new(target_word.clone())
+    let mut typing_playground = TypingPlayground::new(target_word.clone());
+
+    typing_playground
         .run(&mut terminal)
         .expect("There was something wrong");
 
     // Statistics view
-    StatisticsView::new(vec![], target_word)
+    StatisticsView::new(typing_playground.get_user_events(), target_word)
         .run(&mut terminal)
         .expect("Something went wrong with statistics");
 
