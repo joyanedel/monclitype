@@ -3,6 +3,7 @@ use std::io;
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout},
+    style::Color,
     widgets::{
         block::{Position, Title},
         Block, Paragraph, Widget,
@@ -10,7 +11,11 @@ use ratatui::{
     Frame,
 };
 
-use crate::{tui, types::KeyEventSource};
+use crate::{
+    sentences::{build_sentence, verify_sentence_input},
+    tui,
+    types::KeyEventSource,
+};
 
 use super::run::Runnable;
 
@@ -74,17 +79,38 @@ impl Widget for &StatisticsView {
             .constraints(vec![Constraint::Length(3), Constraint::Percentage(100)])
             .split(area);
 
-        let header = Block::bordered().title(title.alignment(Alignment::Center));
-        let wpm =
-            Paragraph::new(format!("Total pressed keys: {}", self.user_events.len())).block(header);
+        // render header
+        let game_status =
+            verify_sentence_input(&build_sentence(&self.user_events), &self.target_word);
+        Block::bordered()
+            .title(title.alignment(Alignment::Center))
+            .render(vertical_layout[0], buf);
+        let header_layout = Layout::horizontal(vec![Constraint::Min(0), Constraint::Min(0)])
+            .vertical_margin(1)
+            .horizontal_margin(1)
+            .split(vertical_layout[0]);
+        Paragraph::new(format!("Total pressed keys: {}", self.user_events.len()))
+            .alignment(Alignment::Left)
+            .render(header_layout[0], buf);
+        Paragraph::new(format!(
+            "Game status: {}",
+            if game_status { "succeed" } else { "failure" }
+        ))
+        .style(if game_status {
+            Color::Green
+        } else {
+            Color::Red
+        })
+        .alignment(Alignment::Right)
+        .render(header_layout[1], buf);
 
+        // render body
         let body = Block::bordered().title(
             instructions
                 .alignment(Alignment::Center)
                 .position(Position::Bottom),
         );
 
-        wpm.render(vertical_layout[0], buf);
         body.render(vertical_layout[1], buf);
         // block.render(area, buf);
     }
