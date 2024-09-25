@@ -2,7 +2,7 @@ use std::io;
 
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use ratatui::{
-    layout::Alignment,
+    layout::{Alignment, Constraint, Direction, Layout},
     widgets::{
         block::{Position, Title},
         Block, Paragraph, Widget,
@@ -69,15 +69,23 @@ impl Widget for &StatisticsView {
     {
         let title = Title::from("Last Run");
         let instructions = Title::from("Press <ESC> to exit");
+        let vertical_layout = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(vec![Constraint::Length(3), Constraint::Percentage(100)])
+            .split(area);
 
-        let block = Block::default()
-            .title(title.alignment(Alignment::Center))
-            .title(
-                instructions
-                    .alignment(Alignment::Center)
-                    .position(Position::Bottom),
-            );
+        let header = Block::bordered().title(title.alignment(Alignment::Center));
+        let wpm =
+            Paragraph::new(format!("Total pressed keys: {}", self.user_events.len())).block(header);
 
-        block.render(area, buf);
+        let body = Block::bordered().title(
+            instructions
+                .alignment(Alignment::Center)
+                .position(Position::Bottom),
+        );
+
+        wpm.render(vertical_layout[0], buf);
+        body.render(vertical_layout[1], buf);
+        // block.render(area, buf);
     }
 }
